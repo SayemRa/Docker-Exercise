@@ -4,6 +4,9 @@ FROM golang:alpine
 # Set working directory
 WORKDIR /app
 
+# Install necessary utilities (ps, uptime)
+RUN apk update && apk add --no-cache procps
+
 # Copy the Go code into the container
 COPY . .
 
