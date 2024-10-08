@@ -1,13 +1,13 @@
-**Synopsis**
+**Synopsis:**
 The purpose of this exercise is to learn (or recap) how to create a system of two interworking services that are started up and stopped together. This requires creation of your own Dockerfiles and docker-compose.yaml, and also creation the simple applications. The applications can be implemented in any programming language (shell script and HTML not allowed), but different programming language must be used for the two applications. You also need to play with some operating system concepts.
 
-**Learning goals**
+**Learning goals:**
 Recap your hands on with Docker and Docker Compose. This is assumed to be known from earlier courses and will be needed in the next steps of the course.
 Understand the relation of containers to the operating system and networking.
 Ensure hands on with Linux.
 See the value of virtualization for application development.
 
-**Task definition**
+**Task definition:**
 In this exercise we will build a simple system composed of two small services (Service1 and Service2) implemented in different programming languages. The services are small programs running in separate containers. Both of these applications collect information from the container:
 -IP address of the container
 -Running processes (e.g. output of “ps -ax” on Ubuntu)
@@ -32,7 +32,7 @@ The IP address may be IP4 or IP6 address – depending on the system. For exampl
 
 Give the images unique names.
 
-**Submitting for grading**
+**Submitting for grading:**
 After the system is ready the student should return (in the git repository – in branch “exercise1”).
 
 Content of two Docker and docker-compose.yaml files
