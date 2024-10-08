@@ -1,0 +1,41 @@
+Here’s a summary of the findings and key takeaways from this exercise:
+
+1. Microservice Design Using Containers
+Objective: The goal was to create a system of two services, each running in a separate container, where one acts as an HTTP server and the other as a secondary service that the server accesses internally. This involved setting up a simple microservice architecture.
+Key Takeaway: This exercise demonstrated how services can be isolated and containerized, which allows them to scale and be deployed independently. Using Docker containers made it easy to manage dependencies and package each service consistently.
+
+2. Using Different Programming Languages
+Service1 (Python): This service acted as an HTTP server, listening on port 8199, collecting and formatting system data like IP, running processes, disk space, and uptime. It also communicated with Service2.
+Service2 (Go): This service provided similar system information, and Service1 fetched this data from it when requested by the external client.
+Key Takeaway: Using different programming languages allowed us to practice integrating services written in different technologies, which is common in modern microservice-based architectures. Each language can be chosen for its strengths.
+
+3. Inter-Container Communication
+Service Interaction: Service1 communicated with Service2 via a Docker network, allowing them to work together even though they were in different containers.
+Key Takeaway: Docker Compose was used to define the network and facilitate communication between containers. This is a crucial concept in container orchestration, enabling services to talk to each other using container networking.
+
+4. System Information Collection
+Information Gathered:
+IP address of the container
+List of running processes
+Disk space usage
+Uptime since the last boot
+Key Takeaway: Collecting this information showed how containers, even when isolated, still allow system-level queries and monitoring of the underlying environment, a useful concept in building observability into services.
+
+5. JSON Response Formatting
+Original Response: Initially, the response was not in the required JSON format, and additional steps were taken to format the output into structured JSON.
+Key Takeaway: Returning information in structured formats like JSON is essential for service interoperability, as it allows easy parsing and interpretation by other services or clients.
+
+6. Dockerization and Docker Compose
+Dockerfiles: Separate Dockerfiles were created for each service, packaging the application code and dependencies.
+Docker Compose: A docker-compose.yaml file was used to define and orchestrate the two containers. This file ensured both services started together and could communicate over a common network.
+Key Takeaway: Docker Compose simplified the management of multiple services. It allowed us to run both services as part of a single environment, define dependencies, and facilitate communication between them.
+
+7. Challenges Faced
+Docker Application: I was facing "docker desktop - unexpected wsl error", which I tried to solve with ChatGPT, but could not solve it. Later had to enable the "SVM" (tips from stack overflow) from the bios to fix and run the docker compose desktop app. 
+Build Errors: Issues were encountered during Docker builds (such as unused imports in Go), highlighting the importance of debugging Dockerfiles and code compatibility in containerized environments.
+JSON Formatting: The initial format of the system information was not in proper JSON, which required changes in the Go and Python code to ensure the output was structured as JSON.
+Key Takeaway: Debugging and testing are essential when setting up containerized services, especially when dealing with cross-service communication and formatting responses.
+
+8. Container IP and Port Management
+Networking: The containers were assigned IP addresses within a private Docker network, and Service1 was exposed to the external world on port 8199. Service2 was not directly exposed but could be reached from Service1.
+Key Takeaway: Understanding how Docker handles networking, port forwarding, and IP addressing is crucial in designing systems where multiple services need to interact, and some need external access.

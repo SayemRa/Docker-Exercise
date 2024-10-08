@@ -1,0 +1,14 @@
+1. The used LLM tool
+- ChatGPT
+
+2. Motivation/reason to use LLM
+- At first I was mtrying to use node.js for the service 2, but faced a lot of errors, which I tried to fix with ChatGPT. Later I switched to GO, which was suggested by chatGPT, to make the process easy.
+
+3. How and why LLM helped
+- LLM helped me to find out how to structure the project and how to design the services. Insted of search engine, I used LLM.
+
+4. What kind of mistakes LLM did
+- ChatGPT suggested wrong fixes when i was having issues with running the Docker Desktop Application, and I was misguided. Later I found solution from stackoverflow.
+
+5. What were things that LLM was not able to provide
+- I faced several error and my output was not showing the uptime and processes, i fixed the issue myself, LLM could not find the issue and was uanble to fix it.
