@@ -1,8 +1,8 @@
-CONTAINER ID   IMAGE                               COMMAND           CREATED              STATUS              PORTS                    NAMES
-1cbc61da52cc   docker-compose-go-python-service1   "python app.py"   About a minute ago   Up About a minute   0.0.0.0:8199->8199/tcp   docker-compose-go-python-service1-1
-be8a973cbc61   docker-compose-go-python-service2   "./service2"      About a minute ago   Up About a minute   0.0.0.0:8080->8080/tcp   docker-compose-go-python-service2-1
+CONTAINER ID   IMAGE                               COMMAND           CREATED         STATUS         PORTS                    NAMES
+7d7028d63d90   docker-compose-go-python-service1   "python app.py"   2 minutes ago   Up 2 minutes   0.0.0.0:8199->8199/tcp   docker-compose-go-python-service1-1
+6f5a37fd5095   docker-compose-go-python-service2   "./service2"      2 minutes ago   Up 2 minutes   0.0.0.0:8080->8080/tcp   docker-compose-go-python-service2-1
 NETWORK ID     NAME                               DRIVER    SCOPE
 a935388e6f37   bridge                             bridge    local
-8797b769f149   docker-compose-go-python_default   bridge    local
+b31967bffc78   docker-compose-go-python_default   bridge    local
 7e56b9a98053   host                               host      local
 08ecc446a004   none                               null      local
