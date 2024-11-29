@@ -1,0 +1,13 @@
+CONTAINER ID   IMAGE                               COMMAND                  CREATED         STATUS         PORTS                  NAMES
+d1b312dc27d1   docker-compose-go-python-nginx      "/docker-entrypoint.…"   5 minutes ago   Up 5 minutes   0.0.0.0:8198->80/tcp   docker-compose-go-python-nginx-1   
+47777670686b   docker-compose-go-python-service2   "./service2"             5 minutes ago   Up 5 minutes   8080/tcp               docker-compose-go-python-service2-1
+b57aa912276e   docker-compose-go-python-service1   "python app.py"          5 minutes ago   Up 5 minutes   8199/tcp               docker-compose-go-python-service1-1
+836f54adedb6   docker-compose-go-python-service1   "python app.py"          5 minutes ago   Up 5 minutes   8199/tcp               docker-compose-go-python-service1-2
+040b7988f089   docker-compose-go-python-service1   "python app.py"          5 minutes ago   Up 5 minutes   8199/tcp               docker-compose-go-python-service1-3
+
+NETWORK ID     NAME                                DRIVER    SCOPE
+e0c7e57cf10b   bridge                              bridge    local
+b31967bffc78   docker-compose-go-python_default    bridge    local
+24dabecac4a3   docker-compose-go-python_nginx_lb   bridge    local
+7e56b9a98053   host                                host      local
+08ecc446a004   none                                null      local

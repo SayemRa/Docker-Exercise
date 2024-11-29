@@ -1,30 +1,43 @@
 import requests
-import json
 from flask import Flask, jsonify
+import subprocess
+import logging
 
 app = Flask(__name__)
 
-def get_system_info():
-    # Get info from Service2
+def execute_command(command):
+    """Helper function to run system commands and return output."""
     try:
-        response = requests.get('http://service2:8199/info')
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        return {"error": str(e)}
+        result = subprocess.check_output(command, shell=True, text=True).strip()
+        return result
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Command '{command}' failed: {e}")
+        return None
 
-@app.route('/info', methods=['GET'])
-def info():
-    # Collect data from Service1 (this container) and Service2
-    system_info = {
-        "Service1": {
-            "ip_address": requests.get('https://api.ipify.org').text,
-            "processes": open('/proc/self/status').read(),
-            "disk_space": open('/proc/mounts').read(),
-            "uptime": open('/proc/uptime').read().split()[0]
-        },
-        "Service2": get_system_info()
+def get_system_info():
+    """Gather system information."""
+    return {
+        "IP address": execute_command("hostname -I"),
+        "Running processes": execute_command("ps -ax"),
+        "Available disk space": execute_command("df -h /"),
+        "Uptime": execute_command("uptime -p")
     }
-    return jsonify(system_info)
+
+@app.route('/', methods=['GET'])
+def index():
+    service1_info = get_system_info()
+    service2_info = None
+    try:
+        response = requests.get('http://service2:8080', timeout=5)
+        response.raise_for_status()
+        service2_info = response.json()
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Failed to get data from Service2: {e}")
+        service2_info = {"error": "Service2 unavailable"}
+    return jsonify({
+        "Service1": service1_info,
+        "Service2": service2_info
+    })
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8199)

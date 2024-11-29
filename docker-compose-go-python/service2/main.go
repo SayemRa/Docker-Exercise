@@ -89,7 +89,7 @@ func infoHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func main() {
-    http.HandleFunc("/info", infoHandler)
-    fmt.Println("Starting server on port 8199...")
-    http.ListenAndServe(":8199", nil)
+    http.HandleFunc("/", infoHandler)
+    fmt.Println("Starting server on port 8080...")
+    http.ListenAndServe(":8080", nil)
 }
