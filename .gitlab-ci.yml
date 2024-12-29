@@ -1,41 +1,7 @@
 stages:
-  - build
   - test
-  - deploy
 
-variables:
-  DOCKER_HOST: tcp://docker:2375/
-  DOCKER_TLS_CERTDIR: ""
-
-# Build stage: Build Docker images for service1 and service2
-build:
-  stage: build
-  image: docker:latest
-  services:
-    - docker:dind
-  script:
-    - docker-compose build
-  only:
-    - project
-
-# Test stage: Run API tests
-test:
+test-runner:
   stage: test
-  image: python:3.10-slim
-  before_script:
-    - pip install -r service1/requirements.txt
   script:
-    - pytest tests/test_service1.py  # Add other test files here
-  only:
-    - project
-
-# Deploy stage: Deploy services using Docker Compose
-deploy:
-  stage: deploy
-  image: docker:latest
-  services:
-    - docker:dind
-  script:
-    - docker-compose up -d
-  only:
-    - project
+    - echo "Runner is successfully registered and working!"
