@@ -7,3 +7,5 @@ test-runner:
     - docker
   script:
     - echo "Runner test successful!"
+
+//test-runner is the job name
