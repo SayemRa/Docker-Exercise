@@ -1,7 +1,2 @@
-stages:
-  - test
-
-test-runner:
-  stage: test
-  script:
-    - echo "Runner is successfully registered and working!"
+tags:
+  - docker
