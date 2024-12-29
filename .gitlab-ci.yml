@@ -1,2 +1,17 @@
-tags:
-  - docker
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  image: mcr.microsoft.com/windows/servercore:ltsc2022
+  script:
+    - echo "Building the application..."
+
+test:
+  stage: test
+  image: python:3.10-windowsservercore-ltsc2022
+  script:
+    - pip install -r service1/requirements.txt
+    - pytest tests/test_service1.py
