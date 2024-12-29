@@ -1,3 +1,5 @@
+image: ubuntu:latest
+
 stages:
   - test
 
@@ -6,4 +8,4 @@ test-job:
   tags:
     - docker
   script:
-    - echo "Runner is working with the corrected Docker image!"
+    - echo "Testing Linux containers with ubuntu:latest!"
