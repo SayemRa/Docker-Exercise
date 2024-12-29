@@ -4,6 +4,6 @@ stages:
 test-runner:
   stage: test
   tags:
-    - windows
+    - docker
   script:
-    - echo "Testing the GitLab Runner service"
+    - echo "Runner test successful!"
