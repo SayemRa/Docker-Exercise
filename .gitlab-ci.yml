@@ -1,9 +1,9 @@
 stages:
   - test
 
-test-runner:
+test-job:
   stage: test
   tags:
     - docker
   script:
-    - echo "Runner test successful!"
+    - echo "Runner is working with the corrected Docker image!"
