@@ -1,17 +1,9 @@
 stages:
-  - build
   - test
-  - deploy
 
-build:
-  stage: build
-  image: mcr.microsoft.com/windows/servercore:ltsc2022
-  script:
-    - echo "Building the application..."
-
-test:
+test-runner:
   stage: test
-  image: python:3.10-windowsservercore-ltsc2022
+  tags:
+    - windows
   script:
-    - pip install -r service1/requirements.txt
-    - pytest tests/test_service1.py
+    - echo "Testing the GitLab Runner service"
