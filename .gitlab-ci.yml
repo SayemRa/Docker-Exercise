@@ -1,0 +1,19 @@
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker-compose build
+
+test:
+  stage: test
+  script:
+    - pytest tests
+
+deploy:
+  stage: deploy
+  script:
+    - docker-compose up -d
