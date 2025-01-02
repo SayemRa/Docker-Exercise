@@ -1,11 +1,29 @@
-image: ubuntu:latest
+image: docker:latest
 
 stages:
+  - build
   - test
+  - deploy
 
-test-job:
+build:
+  stage: build
+  tags:
+    - docker
+  script:
+    - docker-compose build
+
+test:
   stage: test
   tags:
     - docker
   script:
-    - echo "Testing Linux containers with ubuntu:latest!"
+    - docker-compose up -d
+    - python -m unittest discover -s tests
+    - docker-compose down
+
+deploy:
+  stage: deploy
+  tags:
+    - docker
+  script:
+    - docker-compose up -d
