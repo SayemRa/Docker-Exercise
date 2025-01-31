@@ -19,19 +19,17 @@ stages:
   - lint
   - build
   - test
-  - deploy
 
+# Lint Stage
 lint:
   stage: lint
   tags:
     - docker
   script:
     - source venv/bin/activate
-    - pylint service1/app.py --fail-under=5  
-  rules:
-    - changes:
-        - service1/app.py
+    - pylint service1/app.py --fail-under=5
 
+# Build Stage
 build:
   stage: build
   tags:
@@ -39,17 +37,10 @@ build:
   script:
     - docker info
     - docker-compose build
-  rules:
-    - changes:
-        - docker-compose.yaml
-        - Dockerfile
-        - service1/*
-        - service2/*
-  artifacts:
-    paths:
-      - build_logs/
-    expire_in: 1 week
+  only:
+    - main
 
+# Test Stage
 test:
   stage: test
   tags:
@@ -58,17 +49,5 @@ test:
     - docker-compose up -d
     - python -m unittest discover -s tests
     - docker-compose down
-  dependencies:
-    - build
-  rules:
-    - changes:
-        - tests/*
-        - service1/*
-        - service2/*
-
-deploy:
-  tags:
-    - docker
-  stage: deploy
-  script:
-    - docker-compose up -d
+  only:
+    - main
