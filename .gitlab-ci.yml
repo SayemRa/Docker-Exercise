@@ -1,12 +1,13 @@
 image: docker:20.10.24
 
 services:
-  - docker:20.10.24-dind
+  - name: docker:20.10.24-dind
+    command: ["--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock"]
 
 variables:
-  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
-  DOCKER_DRIVER: "overlay2"
+  DOCKER_DRIVER: overlay2
 
 before_script:
   - apk add --no-cache docker-cli python3 py3-pip curl
@@ -19,30 +20,21 @@ stages:
   - build
   - test
 
-# Lint Stage
 lint:
   stage: lint
-  tags:
-    - docker
   script:
     - source venv/bin/activate
     - pylint service1/app.py --fail-under=5
 
-# Build Stage
 build:
   stage: build
-  tags:
-    - docker
   script:
-    - docker info
     - docker-compose build
 
-# Test Stage
 test:
   stage: test
-  tags:
-    - docker
   script:
     - docker-compose up -d
     - python -m unittest discover -s tests
     - docker-compose down
+
