@@ -1,9 +1,7 @@
 image: docker:latest
 
 services:
-  - name: docker:dind
-    command: ["--tls=false", "--privileged"]
-    privileged: true
+  - docker:dind
 
 variables:
   DOCKER_HOST: tcp://docker:2375
