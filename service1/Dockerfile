@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Install necessary utilities (ps, uptime)
 RUN apt-get update && apt-get install -y procps
+RUN apt-get update && apt-get install -y curl
 
 # Install Flask and requests
 COPY requirements.txt requirements.txt

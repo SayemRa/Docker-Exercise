@@ -1,25 +1,37 @@
 version: '3.8'
 services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx_gateway
+    ports:
+      - "8098:8098"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - service1
+      - service2
+    networks:
+      - app_network
+    restart: always
+
   service1:
     build: ./service1
     ports:
       - "8197:8197"
+    networks:
+      - app_network
     depends_on:
       - service2
     restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8197/state || exit 0"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   service2:
     build: ./service2
     ports:
       - "8199:8199"
+    networks:
+      - app_network
     restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8199/info || exit 0"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+
+networks:
+  app_network:
+    driver: bridge
