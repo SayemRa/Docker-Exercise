@@ -2,7 +2,9 @@ image: docker:24.0.7
 
 services:
   - name: docker:dind
-    command: ["--host=tcp://0.0.0.0:2375", "--tls=false"]
+    command:
+      - "--host=tcp://0.0.0.0:2375"
+      - "--tls=false"
     privileged: true
 
 variables:
@@ -24,6 +26,7 @@ stages:
 lint:
   stage: lint
   script:
+    - source venv/bin/activate
     - pylint service1/app.py --fail-under=5
 
 build:
@@ -35,6 +38,6 @@ test:
   stage: test
   script:
     - docker-compose up -d
-    - sleep 10  # Ensure services are running
+    - sleep 10
     - python -m unittest discover -s tests
     - docker-compose down
