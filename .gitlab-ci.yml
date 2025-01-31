@@ -24,20 +24,24 @@ before_script:
   - pip install pylint flask requests
 
 lint:
+  stage: lint
   tags:
     - docker
-  stage: lint
   script:
     - source venv/bin/activate
     - pylint service1/app.py --fail-under=5
 
 build:
   stage: build
+  tags:
+    - docker
   script:
     - docker-compose build
 
 test:
   stage: test
+  tags:
+    - docker
   script:
     - docker-compose up -d
     - echo "Waiting for Service1 to be ready..."
@@ -47,6 +51,8 @@ test:
 
 deploy:
   stage: deploy
+  tags:
+    - docker
   only:
     - main
   script:
