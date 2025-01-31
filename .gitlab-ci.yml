@@ -5,9 +5,9 @@ services:
     command: ["--host=tcp://0.0.0.0:2375", "--tls=false"]
 
 variables:
-  DOCKER_HOST: tcp://docker:2375
+  DOCKER_HOST: "tcp://docker:2375"
   DOCKER_TLS_CERTDIR: ""
-  DOCKER_DRIVER: overlay2
+  DOCKER_DRIVER: "overlay2"
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
 
@@ -31,7 +31,8 @@ lint:
 build:
   stage: build
   script:
-    - docker info
+    - sleep 10
+    - docker info  
     - docker-compose build
   allow_failure: false
 
@@ -39,5 +40,6 @@ test:
   stage: test
   script:
     - docker-compose up -d
+    - sleep 10  # Give time for services to start
     - python -m unittest discover -s tests
     - docker-compose down
