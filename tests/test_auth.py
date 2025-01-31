@@ -1,7 +1,7 @@
 import unittest
 import requests
 
-BASE_URL = "http://service1:8197"
+BASE_URL = "http://localhost:8098"
 
 class TestSecurity(unittest.TestCase):
 
