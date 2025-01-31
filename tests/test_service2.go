@@ -1,24 +1,40 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
 func TestInfoHandler(t *testing.T) {
-	req, err := http.NewRequest("GET", "/info", nil)
-	if err != nil {
-		t.Fatalf("Could not create request: %v", err)
-	}
+	t.Run("ValidResponseStructure", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/info", nil)
+		rr := httptest.NewRecorder()
+		
+		infoHandler(rr, req)
+		
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("Handler returned wrong status: got %v want %v", status, http.StatusOK)
+		}
 
-	rec := httptest.NewRecorder()
-	infoHandler(rec, req)
+		var response SystemInfo
+		if err := json.NewDecoder(rr.Body).Decode(&response); err != nil {
+			t.Fatal("Failed to decode JSON response")
+		}
 
-	res := rec.Result()
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		t.Errorf("Expected status OK; got %v", res.Status)
-	}
+		requiredFields := []string{
+			"ip_address",
+			"running_processes",
+			"disk_space",
+			"uptime",
+			"memory_usage",
+		}
+		
+		for _, field := range requiredFields {
+			if value := reflect.ValueOf(response).FieldByName(strings.Title(field)); value.IsZero() {
+				t.Errorf("Missing required field in response: %s", field)
+			}
+		}
+	})
 }

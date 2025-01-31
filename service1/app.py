@@ -43,14 +43,21 @@ def info():
     except requests.exceptions.RequestException as e:
         return str(e), 500
 
+API_KEY = "my_secure_key"
+
 @app.route('/state', methods=['PUT'])
 def set_state():
     global state
-    new_state = request.data.decode('utf-8').strip()
+    api_key = request.headers.get("X-API-KEY")
+
+    if api_key != API_KEY:
+        return "Unauthorized", 403  # Ensure authentication is working
+
+    new_state = request.get_data(as_text=True).strip()
     valid_states = ["INIT", "PAUSED", "RUNNING", "SHUTDOWN"]
 
     if new_state not in valid_states:
-        return "Invalid state", 400
+        return jsonify({"error": "Invalid state"}), 400  # Return JSON error message
 
     if state != new_state:
         log_state_change(state, new_state)
@@ -60,7 +67,8 @@ def set_state():
 
 @app.route('/state', methods=['GET'])
 def get_state():
-    return jsonify({"state": state})
+    """Return system state with proper JSON format."""
+    return jsonify({"state": state}), 200
 
 @app.route('/request', methods=['GET'])
 def handle_request():
@@ -74,14 +82,17 @@ def get_run_log():
 
 @app.route('/monitor', methods=['GET'])
 def monitor():
-    """Endpoint for monitoring the service."""
+    """Ensure JSON response format even if system is unstable."""
     global request_count
     uptime = time.time() - start_time
-    return jsonify({
+
+    response = {
         "uptime": f"{uptime:.2f} seconds",
         "total_requests": request_count,
         "current_state": state
-    })
+    }
+
+    return jsonify(response), 200
 
 @app.before_request
 def log_request():

@@ -8,9 +8,17 @@ variables:
   DOCKER_TLS_CERTDIR: ""
 
 stages:
+  - lint
   - build
   - test
   - deploy
+
+lint:
+  stage: lint
+  script:
+    - pip install pylint
+    - pylint service1/app.py --fail-under=7  # Ensures good code quality
+    - golangci-lint run ./service2  # Run static analysis for Go
 
 build:
   stage: build
@@ -26,5 +34,7 @@ test:
 
 deploy:
   stage: deploy
+  only:
+    - main  # Ensures deployment happens only on the main branch
   script:
-    - docker-compose up -d
+    - ssh -o StrictHostKeyChecking=no user@your-server-ip "cd /project && git pull && docker-compose up -d"
