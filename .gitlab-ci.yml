@@ -1,39 +1,33 @@
+---
 image: docker:24.0.7
-
 services:
   - name: docker:dind
     command:
-      - "--host=tcp://0.0.0.0:2375"
-      - "--tls=false"
+      - --host=tcp://0.0.0.0:2375
+      - --tls=false
     privileged: true
-
 variables:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
-
 before_script:
   - apk add --no-cache python3 py3-pip iptables
   - python3 -m venv venv
   - source venv/bin/activate
   - pip install pylint flask requests
-
 stages:
   - lint
   - build
   - test
-
 lint:
   stage: lint
   script:
     - source venv/bin/activate
     - pylint service1/app.py --fail-under=5
-
 build:
   stage: build
   script:
     - docker-compose build
-
 test:
   stage: test
   script:
