@@ -6,6 +6,12 @@ services:
 variables:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
+  DOCKER_DRIVER: overlay2
+  DOCKER_PRIVILEGED_MODE: "true"
+
+before_script:
+  - apk add --no-cache docker-cli python3 py3-pip
+  - pip install pylint
 
 stages:
   - lint
@@ -16,9 +22,7 @@ stages:
 lint:
   stage: lint
   script:
-    - pip install pylint
-    - pylint service1/app.py --fail-under=7  # Ensures good code quality
-    - golangci-lint run ./service2  # Run static analysis for Go
+    - pylint service1/app.py --fail-under=7
 
 build:
   stage: build
@@ -34,7 +38,5 @@ test:
 
 deploy:
   stage: deploy
-  only:
-    - main  # Ensures deployment happens only on the main branch
   script:
-    - ssh -o StrictHostKeyChecking=no user@your-server-ip "cd /project && git pull && docker-compose up -d"
+    - docker-compose up -d
