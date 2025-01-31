@@ -36,8 +36,6 @@ build:
   script:
     - docker info
     - docker-compose build
-  only:
-    - main
 
 # Test Stage
 test:
@@ -48,5 +46,3 @@ test:
     - docker-compose up -d
     - python -m unittest discover -s tests
     - docker-compose down
-  only:
-    - main
