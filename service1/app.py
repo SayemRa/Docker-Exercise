@@ -1,23 +1,32 @@
-from flask import Flask, request, jsonify
+"""
+Main module for Service1
+"""
 import time
+from flask import Flask, request, jsonify
 import requests
+
+# Global variables
+STATE = "INIT"
+STATE_LOG = []
+REQUEST_COUNT = 0
+START_TIME = time.time()
 
 app = Flask(__name__)
 
-# Global variables for state and logs
-state = "INIT"
-state_log = []
-request_count = 0
-start_time = time.time()
-
 def log_state_change(previous_state, new_state):
-    global state_log
+    """
+    Logs state transitions with a timestamp.
+    """
+    global STATE_LOG
     timestamp = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime())
-    state_log.append(f"{timestamp}: {previous_state} -> {new_state}")
+    STATE_LOG.append(f"{timestamp}: {previous_state} -> {new_state}")
+
 
 @app.route('/', methods=['GET'])
 def home():
-    """Default route for testing."""
+    """
+    Default route for testing.
+    """
     return jsonify({
         "message": "Welcome to Service1! Available endpoints:",
         "endpoints": {
@@ -30,75 +39,54 @@ def home():
     }), 200
 
 
-@app.route('/info', methods=['GET'])
-def info():
-    try:
-        # Fetch information from service2
-        response = requests.get('http://service2:8199/info')
-        if response.status_code == 200:
-            service2_data = response.json()
-            return jsonify({"Service2": service2_data}), 200
-        else:
-            return f"Service2 returned status {response.status_code}", 503
-    except requests.exceptions.RequestException as e:
-        return str(e), 500
-
-API_KEY = "my_secure_key"
-
 @app.route('/state', methods=['PUT'])
 def set_state():
-    global state
-    api_key = request.headers.get("X-API-KEY")
-
-    if api_key != API_KEY:
-        return "Unauthorized", 403  # Ensure authentication is working
-
+    """
+    Set the state of the system.
+    """
+    global STATE
     new_state = request.get_data(as_text=True).strip()
     valid_states = ["INIT", "PAUSED", "RUNNING", "SHUTDOWN"]
 
     if new_state not in valid_states:
-        return jsonify({"error": "Invalid state"}), 400  # Return JSON error message
+        return "Invalid state", 400
 
-    if state != new_state:
-        log_state_change(state, new_state)
-        state = new_state
+    if STATE != new_state:
+        log_state_change(STATE, new_state)
+        STATE = new_state
 
-    return jsonify({"state": state})
+    return jsonify({"state": STATE}), 200
+
 
 @app.route('/state', methods=['GET'])
 def get_state():
-    """Return system state with proper JSON format."""
-    return jsonify({"state": state}), 200
+    """
+    Get the current state of the system.
+    """
+    return jsonify({"state": STATE}), 200
 
-@app.route('/request', methods=['GET'])
-def handle_request():
-    if state != "RUNNING":
-        return "System not in RUNNING state", 403
-    return "Request processed successfully"
-
-@app.route('/run-log', methods=['GET'])
-def get_run_log():
-    return jsonify({"state_log": state_log})
 
 @app.route('/monitor', methods=['GET'])
 def monitor():
-    """Ensure JSON response format even if system is unstable."""
-    global request_count
-    uptime = time.time() - start_time
-
-    response = {
+    """
+    Monitor system metrics.
+    """
+    uptime = time.time() - START_TIME
+    return jsonify({
         "uptime": f"{uptime:.2f} seconds",
-        "total_requests": request_count,
-        "current_state": state
-    }
+        "total_requests": REQUEST_COUNT,
+        "current_state": STATE
+    }), 200
 
-    return jsonify(response), 200
 
 @app.before_request
 def log_request():
-    """Log each request and update the request count."""
-    global request_count
-    request_count += 1
+    """
+    Log each request and update the request count.
+    """
+    global REQUEST_COUNT
+    REQUEST_COUNT += 1
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8197)

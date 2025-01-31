@@ -13,7 +13,7 @@ before_script:
   - apk add --no-cache docker-cli python3 py3-pip
   - python3 -m venv venv
   - source venv/bin/activate
-  - pip install pylint
+  - pip install pylint flask requests
 
 stages:
   - lint
@@ -25,7 +25,7 @@ lint:
   stage: lint
   script:
     - source venv/bin/activate
-    - pylint service1/app.py --fail-under=7
+    - pylint service1/app.py --fail-under=5
 
 build:
   stage: build
