@@ -20,7 +20,7 @@ def log_state_change(previous_state, new_state):
     global STATE_LOG
     timestamp = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime())
     STATE_LOG.append(f"{timestamp}: {previous_state} -> {new_state}")
-
+    print(f"LOG: {STATE_LOG}")  # Debugging
 
 @app.route('/', methods=['GET'])
 def home():
@@ -38,18 +38,29 @@ def home():
         }
     }), 200
 
+API_KEY = "my_secure_key"
+
+def validate_api_key():
+    """
+    Validates the API Key in the request headers.
+    """
+    api_key = request.headers.get("X-API-KEY")
+    return api_key == API_KEY
 
 @app.route('/state', methods=['PUT'])
 def set_state():
     """
-    Set the state of the system.
+    Set the state of the system, requiring authentication.
     """
     global STATE
+    if not validate_api_key():
+        return jsonify({"error": "Unauthorized"}), 403
+
     new_state = request.get_data(as_text=True).strip()
     valid_states = ["INIT", "PAUSED", "RUNNING", "SHUTDOWN"]
 
     if new_state not in valid_states:
-        return "Invalid state", 400
+        return jsonify({"error": "Invalid state"}), 400
 
     if STATE != new_state:
         log_state_change(STATE, new_state)
@@ -65,19 +76,51 @@ def get_state():
     """
     return jsonify({"state": STATE}), 200
 
-
 @app.route('/monitor', methods=['GET'])
 def monitor():
     """
     Monitor system metrics.
     """
-    uptime = time.time() - START_TIME
+    global REQUEST_COUNT, START_TIME
+    uptime_seconds = round(time.time() - START_TIME, 2)
+
     return jsonify({
-        "uptime": f"{uptime:.2f} seconds",
-        "total_requests": REQUEST_COUNT,
+        "uptime": uptime_seconds,
+        "total_requests": REQUEST_COUNT,  
         "current_state": STATE
     }), 200
 
+
+# app.py (Service1)
+@app.route('/info', methods=['GET'])
+def get_service2_info():
+    try:
+        response = requests.get("http://service2:8199/info")  
+        if response.status_code == 200:
+            service2_data = response.json()
+            return jsonify({"Service2": service2_data}), 200
+        return jsonify({"error": "Service2 unavailable"}), 503
+    except requests.RequestException:
+        return jsonify({"error": "Failed to fetch Service2 data"}), 500
+    
+
+
+@app.route('/run-log', methods=['GET'])
+def get_run_log():
+    """
+    Returns the logged state transitions, even in SHUTDOWN state.
+    """
+    return jsonify({"logs": STATE_LOG}), 200
+
+@app.before_request
+def check_shutdown():
+    """
+    Prevent all requests when in SHUTDOWN state, except essential ones.
+    """
+    global STATE
+    allowed_paths = ["/state", "/monitor", "/run-log"]
+    if STATE == "SHUTDOWN" and request.path not in allowed_paths:
+        return jsonify({"error": "Service unavailable"}), 503
 
 @app.before_request
 def log_request():
@@ -86,7 +129,6 @@ def log_request():
     """
     global REQUEST_COUNT
     REQUEST_COUNT += 1
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8197)

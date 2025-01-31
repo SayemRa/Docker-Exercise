@@ -15,6 +15,8 @@ COPY go.mod go.sum ./
 
 # Download dependencies
 RUN go mod download
+RUN apk add --no-cache curl
+
 
 # Copy the rest of the application
 COPY . .
