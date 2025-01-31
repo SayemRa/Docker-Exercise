@@ -11,17 +11,17 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_PRIVILEGED_MODE: "true"
 
-before_script:
-  - apk add --no-cache docker-cli python3 py3-pip
-  - python3 -m venv venv
-  - source venv/bin/activate
-  - pip install pylint flask requests
-
 stages:
   - lint
   - build
   - test
   - deploy
+
+before_script:
+  - apk add --no-cache docker-cli python3 py3-pip curl
+  - python3 -m venv venv
+  - source venv/bin/activate
+  - pip install pylint flask requests
 
 lint:
   stage: lint
@@ -38,10 +38,14 @@ test:
   stage: test
   script:
     - docker-compose up -d
-    - python -m unittest discover -s tests
+    - echo "Waiting for Service1 to be ready..."
+    - until curl -sSf http://localhost:8197/state; do sleep 5; done
+    - docker-compose exec service1 python -m unittest discover -s tests
     - docker-compose down
 
 deploy:
   stage: deploy
+  only:
+    - main
   script:
     - docker-compose up -d
