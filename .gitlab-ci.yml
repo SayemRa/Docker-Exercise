@@ -23,24 +23,32 @@ stages:
 
 lint:
   stage: lint
+  tags:
+    - docker
   script:
     - source venv/bin/activate
     - pylint service1/app.py --fail-under=5
 
 build:
   stage: build
+  tags:
+    - docker
   script:
     - docker info
     - docker-compose build  
 
 test:
   stage: test
+  tags:
+    - docker
   script:
     - docker-compose up -d
     - python -m unittest discover -s tests
     - docker-compose down
 
 deploy:
+  tags:
+    - docker
   stage: deploy
   script:
     - docker-compose up -d
