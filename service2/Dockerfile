@@ -1,13 +1,22 @@
 # Use the Go base image
 FROM golang:alpine
 
+# Set environment variables to speed up builds
+ENV GO111MODULE=on \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64
+
 # Set working directory
 WORKDIR /app
 
-# Ensure the working directory is writable
-RUN chmod -R 777 /app
+# Copy only the go.mod and go.sum files for dependency caching
+COPY go.mod go.sum ./
 
-# Copy the Go code into the container
+# Download dependencies
+RUN go mod download
+
+# Copy the rest of the application
 COPY . .
 
 # Build the application
