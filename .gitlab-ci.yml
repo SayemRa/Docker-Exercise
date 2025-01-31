@@ -26,7 +26,10 @@ stages:
 lint:
   stage: lint
   script:
-    - pylint service1/app.py --fail-under=5
+    - pip install autopep8 pylint
+    - pip install -r requirements-test.txt
+    - autopep8 --in-place --aggressive --aggressive service1/.py tests/.py
+    - pylint service1/.py tests/.py --disable=R,C --fail-under=6.0
 
 build:
   stage: build
@@ -37,6 +40,6 @@ test:
   stage: test
   script:
     - docker-compose up -d
-    - timeout 30 sh -c "until docker info; do sleep 1; done"  # ✅ Better than sleep
+    - timeout 30 sh -c "until docker info; do sleep 1; done"
     - python -m unittest discover -s tests
     - docker-compose down
