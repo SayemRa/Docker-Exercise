@@ -2,7 +2,7 @@ import unittest
 import requests
 
 SERVICE1_URL = "http://localhost:8197"
-SERVICE2_URL = "http://localhost:8080"
+SERVICE2_URL = "http://localhost:8199"
 
 class TestIntegration(unittest.TestCase):
 
