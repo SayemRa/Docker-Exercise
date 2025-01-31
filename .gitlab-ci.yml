@@ -24,6 +24,8 @@ before_script:
   - pip install pylint flask requests
 
 lint:
+  tags:
+    - docker
   stage: lint
   script:
     - source venv/bin/activate
