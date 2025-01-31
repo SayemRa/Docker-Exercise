@@ -1,9 +1,8 @@
-image: docker:latest
+image: docker:27.2.0
 
 services:
   - name: docker:dind
     command: ["--tls=false", "--host=tcp://0.0.0.0:2375"]
-    privileged: true
 
 variables:
   DOCKER_HOST: "tcp://docker:2375"
@@ -11,6 +10,7 @@ variables:
   DOCKER_DRIVER: "overlay2"
   DOCKER_BUILDKIT: "1"
   COMPOSE_DOCKER_CLI_BUILD: "1"
+  DOCKER_PRIVILEGED_MODE: "true"
 
 before_script:
   - apk add --no-cache python3 py3-pip iptables
@@ -26,20 +26,19 @@ stages:
 lint:
   stage: lint
   script:
-    - autopep8 --in-place --aggressive --aggressive service1/*.py tests/*.py || true
-    - pylint service1/*.py tests/*.py --disable=R,C --fail-under=6.0 || true
+    - autopep8 --in-place --aggressive --aggressive service1/*.py tests/*.py
+    - pylint service1/*.py tests/*.py --disable=R,C --fail-under=6.0
 
 build:
   stage: build
   script:
-    - sleep 20 
-    - docker info  
-    - docker-compose build || true
+    - timeout 60 sh -c "until docker info; do sleep 1; done"  # Wait for Docker
+    - docker-compose build
 
 test:
   stage: test
   script:
     - docker-compose up -d
-    - sleep 10  # Give services time to start
-    - python -m unittest discover -s tests || true
+    - timeout 30 sh -c "until curl -s http://service1:8197/state; do sleep 1; done"
+    - python -m unittest discover -s tests
     - docker-compose down
