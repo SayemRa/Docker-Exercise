@@ -1,14 +1,12 @@
 image: docker:20.10.24
 
 services:
-  - name: docker:20.10.24-dind
-    command: ["--tls=false"]
+  - docker:20.10.24-dind
 
 variables:
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: "" 
-  DOCKER_DRIVER: overlay2
-  DOCKER_PRIVILEGED_MODE: "true"
+  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_DRIVER: "overlay2"
 
 before_script:
   - apk add --no-cache docker-cli python3 py3-pip curl
@@ -38,6 +36,8 @@ build:
   script:
     - docker info
     - docker-compose build
+  only:
+    - main
 
 # Test Stage
 test:
@@ -45,8 +45,8 @@ test:
   tags:
     - docker
   script:
-    - docker info
     - docker-compose up -d
-    - sleep 10  # Wait for services to start
     - python -m unittest discover -s tests
     - docker-compose down
+  only:
+    - main
