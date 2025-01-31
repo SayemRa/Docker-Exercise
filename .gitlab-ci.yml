@@ -27,7 +27,10 @@ lint:
     - docker
   script:
     - source venv/bin/activate
-    - pylint service1/app.py --fail-under=5
+    - pylint service1/app.py --fail-under=5  
+  rules:
+    - changes:
+        - service1/app.py
 
 build:
   stage: build
@@ -35,7 +38,17 @@ build:
     - docker
   script:
     - docker info
-    - docker-compose build  
+    - docker-compose build
+  rules:
+    - changes:
+        - docker-compose.yaml
+        - Dockerfile
+        - service1/*
+        - service2/*
+  artifacts:
+    paths:
+      - build_logs/
+    expire_in: 1 week
 
 test:
   stage: test
@@ -45,6 +58,13 @@ test:
     - docker-compose up -d
     - python -m unittest discover -s tests
     - docker-compose down
+  dependencies:
+    - build
+  rules:
+    - changes:
+        - tests/*
+        - service1/*
+        - service2/*
 
 deploy:
   tags:
